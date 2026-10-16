@@ -1,33 +1,29 @@
 from connection import *
+import asyncio
 
-def add_user(full_name, age, email):
+async def add_user(full_name, age, email):
     try:
-        conn = connection()
-        cur = conn.cursor()
-        cur.execute("""
+        conn = await connection()
+        await conn.execute("""
         INSERT INTO users(full_name, age, email) VALUES
-        (%s, %s, %s)  
-            """, (full_name, age, email,))
+        ($1, $2, $3)  
+            """, full_name, age, email)
         print("User added")
     except Exception as error:
         print(f"Add user error: {error}") 
     finally:
-        cur.close()
-        conn.commit()      
+        await conn.close()
         
-        
-def get_user():
+            
+async def get_user():
     try:
-        conn = connection()
-        cur = conn.cursor()
-        cur.execute("""
+        conn = await connection()
+        users = await conn.fetch("""
         select * from users
             """)
-        users = cur.fetchall()
         return users
     except Exception as error:
         print(f"Get user error: {error}") 
     finally:
-        cur.close()
-        conn.commit()      
+        await conn.close()
         
